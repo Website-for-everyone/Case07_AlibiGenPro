@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AlibiGen Pro 98 // DEADLINE DEFENDER</title>
+  <link rel="stylesheet" href="style.css">
+  <link href="https://fonts.googleapis.com/css2?family=VT323&family=Pixelify+Sans:wght@500;700&display=swap" rel="stylesheet">
+</head>
+<body class="desktop-body">
+  <!-- CRT Scanline Overlay -->
+  <div class="crt-overlay" id="crtOverlay"></div>
+
+  <!-- Desktop Icons -->
+  <div class="desktop-icons">
+    <div class="icon-item" id="iconGen">
+      <div class="icon-glyph">💾</div>
+      <span>AlibiGen.exe</span>
+    </div>
+    <div class="icon-item" id="iconStudio">
+      <div class="icon-glyph">🖥</div>
+      <span>CrashStudio</span>
+    </div>
+    <div class="icon-item" id="iconTerminal">
+      <div class="icon-glyph">📟</div>
+      <span>SysLog.log</span>
+    </div>
+  </div>
+
+  <!-- Window 1: Excuse Generator -->
+  <div class="win98-window" id="winGenerator" style="top: 30px; left: 60px; width: 440px;">
+    <div class="win-titlebar">
+      <div class="title-left">
+        <span class="win-icon">💡</span>
+        <span class="win-title">Alibi Generator v2.4 (Registered)</span>
+      </div>
+      <div class="win-controls">
+        <button class="win-btn" title="Minimize">_</button>
+        <button class="win-btn" title="Maximize">□</button>
+        <button class="win-btn close-btn" title="Close">×</button>
+      </div>
+    </div>
+    <div class="win-body">
+      <div class="form-group">
+        <label>TARGET RECIPIENT:</label>
+        <select id="selRecipient" class="win-select">
+          <option value="client">Client (Заказчик / Клиент)</option>
+          <option value="teamlead" selected>Team Lead (Тимлид / ПМ)</option>
+          <option value="boss">Boss / CTO (Генеральный / Шеф)</option>
+          <option value="spouse">Spouse / Partner (Супруг(а) / Девушка)</option>
+          <option value="professor">Professor (Преподаватель / Деканат)</option>
+        </select>
+      </div>
+
+      <!-- Slider 1: Absurdity -->
+      <div class="slider-row">
+        <div class="slider-labels">
+          <span>Уровень абсурда:</span>
+          <span class="val-badge" id="valAbsurd">35%</span>
+        </div>
+        <input type="range" id="rngAbsurd" min="0" max="100" value="35" class="win-slider"/>
+      </div>
+
+      <!-- Slider 2: Pity -->
+      <div class="slider-row">
+        <div class="slider-labels">
+          <span>Степень жалости:</span>
+          <span class="val-badge" id="valPity">40%</span>
+        </div>
+        <input type="range" id="rngPity" min="0" max="100" value="40" class="win-slider"/>
+      </div>
+
+      <!-- Slider 3: Tech Jargon -->
+      <div class="slider-row">
+        <div class="slider-labels">
+          <span>Техническая заумность:</span>
+          <span class="val-badge" id="valTech">85%</span>
+        </div>
+        <input type="range" id="rngTech" min="0" max="100" value="85" class="win-slider"/>
+      </div>
+
+      <button class="win-button btn-primary" id="btnSynthesize">
+        ⚙ СИНТЕЗИРОВАТЬ ОТМАЗКУ
+      </button>
+
+      <div class="output-box">
+        <label>СГЕНЕРИРОВАННОЕ ОПРАВДАНИЕ:</label>
+        <textarea id="txtExcuse" class="win-textarea" rows="4" readonly></textarea>
+        <div class="output-footer">
+          <div class="metric-cell">
+            <span>ПРАВДОПОДОБИЕ:</span>
+            <div class="meter-bar"><div class="meter-fill" id="meterFill" style="width: 78%;"></div></div>
+            <strong id="believabilityVal">78%</strong>
+          </div>
+          <button class="win-button" id="btnCopy">КОПИРОВАТЬ</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Window 2: Crash Evidence Studio -->
+  <div class="win98-window" id="winStudio" style="top: 50px; left: 520px; width: 560px;">
+    <div class="win-titlebar">
+      <div class="title-left">
+        <span class="win-icon">📸</span>
+        <span class="win-title">Crash Evidence Studio - [Evidence01.png]</span>
+      </div>
+      <div class="win-controls">
+        <button class="win-btn">_</button>
+        <button class="win-btn">□</button>
+        <button class="win-btn close-btn">×</button>
+      </div>
+    </div>
+    <div class="win-body">
+      <div class="studio-controls">
+        <div class="form-row">
+          <label>PRESET:</label>
+          <select id="selPreset" class="win-select">
+            <option value="bsod" selected>Windows BSoD (Fatal Exception 0E)</option>
+            <option value="kernel_panic">Linux Kernel Panic (CPU Core Dump)</option>
+            <option value="gateway500">HTTP 502 / 500 Bad Gateway</option>
+            <option value="compiler">Compiler Fatal Error Trace (GCC / Rust)</option>
+          </select>
+        </div>
+        <div class="form-row">
+          <label>CUSTOM ERROR / REASON:</label>
+          <input type="text" id="txtCustomError" class="win-input" value="CRITICAL_PROCESS_DIED 0x000000EF" />
+        </div>
+      </div>
+
+      <!-- Live Canvas Preview -->
+      <div class="canvas-viewport">
+        <canvas id="evidenceCanvas" width="600" height="360"></canvas>
+      </div>
+
+      <div class="canvas-actions">
+        <button class="win-button" id="btnRefreshCanvas">ОБНОВИТЬ СКРИНШОТ</button>
+        <button class="win-button btn-primary" id="btnDownloadEvidence">💾 СКАЧАТЬ PNG ДОКАЗАТЕЛЬСТВО</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bottom Taskbar -->
+  <div class="win-taskbar">
+    <button class="start-btn" id="startBtn">
+      <span class="win-flag">🪟</span>
+      <strong>Пуск</strong>
+    </button>
+    <div class="taskbar-divider"></div>
+    <div class="active-tasks">
+      <div class="task-tab active">AlibiGen Pro</div>
+      <div class="task-tab">Evidence Studio</div>
+    </div>
+    <div class="system-tray">
+      <label class="crt-toggle-label">
+        <input type="checkbox" id="chkCrt" checked />
+        <span>CRT 50Hz</span>
+      </label>
+      <div class="tray-clock" id="trayClock">19:45</div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>

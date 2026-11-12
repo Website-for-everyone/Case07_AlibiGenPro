@@ -1,0 +1,13 @@
+{
+  "name": "alibigen-pro",
+  "version": "1.0.0",
+  "description": "Y2K Retro OS Deadline Excuse & Fake Crash Evidence Generator",
+  "main": "web/app.js",
+  "scripts": {
+    "start": "python api/server.py",
+    "test": "pytest tests/ -v"
+  },
+  "keywords": ["y2k", "retro-os", "windows-98", "excuse-generator", "bsod", "telegram-bot"],
+  "author": "Daniel Idrisov (@Idrisov_prod)",
+  "license": "MIT"
+}
