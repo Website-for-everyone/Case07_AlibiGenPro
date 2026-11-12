@@ -1,0 +1,355 @@
+/* Y2K Windows 98 Design Tokens */
+:root {
+  --win-gray: #C0C0C0;
+  --win-dark: #808080;
+  --win-darker: #404040;
+  --win-light: #FFFFFF;
+  --win-navy: #000080;
+  --win-cyan: #1084D0;
+  --desktop-teal: #008080;
+  --font-retro: 'MS Sans Serif', Tahoma, 'Pixelify Sans', sans-serif;
+  --font-terminal: 'VT323', monospace;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  user-select: none;
+}
+
+body.desktop-body {
+  background-color: var(--desktop-teal);
+  font-family: var(--font-retro);
+  font-size: 12px;
+  color: #000;
+  height: 100vh;
+  width: 100vw;
+  overflow: hidden;
+  position: relative;
+}
+
+/* CRT Scanline Overlay */
+.crt-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none;
+  background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.03), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.03));
+  background-size: 100% 3px, 6px 100%;
+  z-index: 999;
+}
+
+.crt-overlay.disabled {
+  display: none;
+}
+
+/* Desktop Icons */
+.desktop-icons {
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.icon-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 72px;
+  cursor: pointer;
+  color: #FFF;
+  text-align: center;
+  text-shadow: 1px 1px 1px #000;
+}
+
+.icon-glyph {
+  font-size: 32px;
+  margin-bottom: 4px;
+}
+
+.icon-item:hover span {
+  background-color: var(--win-navy);
+}
+
+/* Win98 Window Chrome */
+.win98-window {
+  position: absolute;
+  background-color: var(--win-gray);
+  border-top: 2px solid var(--win-light);
+  border-left: 2px solid var(--win-light);
+  border-right: 2px solid var(--win-darker);
+  border-bottom: 2px solid var(--win-darker);
+  box-shadow: 2px 2px 0 rgba(0, 0, 0, 0.5);
+  display: flex;
+  flex-direction: column;
+  z-index: 10;
+}
+
+.win-titlebar {
+  background: linear-gradient(90deg, var(--win-navy), var(--win-cyan));
+  color: #FFF;
+  padding: 3px 6px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-weight: bold;
+  cursor: move;
+}
+
+.title-left {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.win-controls {
+  display: flex;
+  gap: 2px;
+}
+
+.win-btn {
+  background-color: var(--win-gray);
+  border-top: 1px solid var(--win-light);
+  border-left: 1px solid var(--win-light);
+  border-right: 1px solid var(--win-darker);
+  border-bottom: 1px solid var(--win-darker);
+  width: 16px;
+  height: 14px;
+  font-size: 10px;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.win-btn:active {
+  border-top: 1px solid var(--win-darker);
+  border-left: 1px solid var(--win-darker);
+  border-right: 1px solid var(--win-light);
+  border-bottom: 1px solid var(--win-light);
+}
+
+.win-body {
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* Form Controls */
+.form-group, .slider-row, .form-row {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.slider-labels {
+  display: flex;
+  justify-content: space-between;
+  font-size: 11px;
+}
+
+.val-badge {
+  font-weight: bold;
+  color: var(--win-navy);
+}
+
+.win-select, .win-input, .win-textarea {
+  background: #FFF;
+  border-top: 2px solid var(--win-darker);
+  border-left: 2px solid var(--win-darker);
+  border-right: 2px solid var(--win-light);
+  border-bottom: 2px solid var(--win-light);
+  padding: 4px 6px;
+  font-family: inherit;
+  font-size: 12px;
+  outline: none;
+}
+
+.win-slider {
+  accent-color: var(--win-navy);
+  cursor: pointer;
+}
+
+/* Win98 Button */
+.win-button {
+  background-color: var(--win-gray);
+  border-top: 2px solid var(--win-light);
+  border-left: 2px solid var(--win-light);
+  border-right: 2px solid var(--win-darker);
+  border-bottom: 2px solid var(--win-darker);
+  padding: 6px 12px;
+  font-family: inherit;
+  font-size: 11px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.win-button:active {
+  border-top: 2px solid var(--win-darker);
+  border-left: 2px solid var(--win-darker);
+  border-right: 2px solid var(--win-light);
+  border-bottom: 2px solid var(--win-light);
+  padding: 7px 11px 5px 13px;
+}
+
+.btn-primary {
+  color: var(--win-navy);
+}
+
+/* Output Box */
+.output-box {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 6px;
+}
+
+.output-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.metric-cell {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 11px;
+}
+
+.meter-bar {
+  width: 80px;
+  height: 12px;
+  background: #FFF;
+  border: 1px solid var(--win-dark);
+}
+
+.meter-fill {
+  height: 100%;
+  background: #008000;
+}
+
+/* Studio & Canvas */
+.studio-controls {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.canvas-viewport {
+  background: #000;
+  border-top: 2px solid var(--win-darker);
+  border-left: 2px solid var(--win-darker);
+  border-right: 2px solid var(--win-light);
+  border-bottom: 2px solid var(--win-light);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+}
+
+#evidenceCanvas {
+  max-width: 100%;
+  height: auto;
+  image-rendering: pixelated;
+}
+
+.canvas-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+/* Bottom Taskbar */
+.win-taskbar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100vw;
+  height: 28px;
+  background-color: var(--win-gray);
+  border-top: 2px solid var(--win-light);
+  display: flex;
+  align-items: center;
+  padding: 2px 4px;
+  gap: 6px;
+  z-index: 900;
+}
+
+.start-btn {
+  background-color: var(--win-gray);
+  border-top: 2px solid var(--win-light);
+  border-left: 2px solid var(--win-light);
+  border-right: 2px solid var(--win-darker);
+  border-bottom: 2px solid var(--win-darker);
+  padding: 2px 6px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  cursor: pointer;
+  font-family: inherit;
+  font-weight: bold;
+}
+
+.start-btn:active {
+  border-top: 2px solid var(--win-darker);
+  border-left: 2px solid var(--win-darker);
+  border-right: 2px solid var(--win-light);
+  border-bottom: 2px solid var(--win-light);
+}
+
+.taskbar-divider {
+  width: 2px;
+  height: 18px;
+  border-left: 1px solid var(--win-dark);
+  border-right: 1px solid var(--win-light);
+}
+
+.active-tasks {
+  display: flex;
+  flex: 1;
+  gap: 4px;
+}
+
+.task-tab {
+  background-color: var(--win-gray);
+  border-top: 1px solid var(--win-light);
+  border-left: 1px solid var(--win-light);
+  border-right: 1px solid var(--win-darker);
+  border-bottom: 1px solid var(--win-darker);
+  padding: 2px 8px;
+  font-size: 11px;
+}
+
+.task-tab.active {
+  background-color: #E0E0E0;
+  border-top: 1px solid var(--win-darker);
+  border-left: 1px solid var(--win-darker);
+  border-right: 1px solid var(--win-light);
+  border-bottom: 1px solid var(--win-light);
+  font-weight: bold;
+}
+
+.system-tray {
+  border-top: 1px solid var(--win-dark);
+  border-left: 1px solid var(--win-dark);
+  border-right: 1px solid var(--win-light);
+  border-bottom: 1px solid var(--win-light);
+  padding: 2px 8px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 11px;
+}
+
+.crt-toggle-label {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  cursor: pointer;
+}

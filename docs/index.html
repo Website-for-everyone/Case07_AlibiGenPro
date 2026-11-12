@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+<script>
+(function() {
+  const MOCK_DB = {};
+  const STORAGE_KEY = "idrisov_demo_" + "Case07_AlibiGenPro";
+  let localState = {};
+  try { localState = JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}"); } catch(e) {}
+  function saveState() { try { localStorage.setItem(STORAGE_KEY, JSON.stringify(localState)); } catch(e) {} }
+
+  const origFetch = window.fetch.bind(window);
+  window.fetch = async function(input, init) {
+    const urlStr = typeof input === "string" ? input : (input && input.url) || "";
+    if (!urlStr.includes("/api/")) {
+      return origFetch(input, init);
+    }
+
+    const method = ((init && init.method) || "GET").toUpperCase();
+    let body = {};
+    if (init && init.body && typeof init.body === "string") {
+      try { body = JSON.parse(init.body); } catch(e) {}
+    }
+
+    const pathOnly = urlStr.split("?")[0];
+    const urlPath = pathOnly.startsWith("http") ? new URL(pathOnly).pathname : pathOnly;
+
+    // 1. Exact GET match from extracted FastAPI TestClient data
+    if (method === "GET") {
+      if (MOCK_DB[urlStr]) return jsonResp(MOCK_DB[urlStr]);
+      if (MOCK_DB[urlPath]) return jsonResp(MOCK_DB[urlPath]);
+      for (const k of Object.keys(MOCK_DB)) {
+        if (k.split("?")[0] === urlPath) return jsonResp(MOCK_DB[k]);
+      }
+      if (urlPath.includes("/api/dataset/") && !MOCK_DB[urlPath]) {
+        const fallbackKey = Object.keys(MOCK_DB).find(k => k.startsWith("/api/dataset/"));
+        if (fallbackKey) return jsonResp(MOCK_DB[fallbackKey]);
+      }
+    }
+
+    // 2. Dynamic Calculators & Interactive Endpoints
+    if (urlPath.endsWith("/calculate")) {
+      const base = Number(body.base_price || body.area || body.days || 1) * 1500 || 4500;
+      const total = Math.max(2500, Math.round(base + (Number(body.weight_kg || 5) * 200)));
+      return jsonResp({
+        status: "ok",
+        total_price: total,
+        price_rub: total,
+        estimated_price: total,
+        duration_minutes: 90,
+        breakdown: { base: Math.round(total * 0.7), extras: Math.round(total * 0.3) },
+        currency: "RUB"
+      });
+    }
+
+    if (urlPath.includes("/estimate")) {
+      return jsonResp({
+        status: "ok",
+        total_rub: 3850000,
+        timeline_weeks: 8,
+        summary: "Смета сформирована (Static Demo Mode)",
+        estimate_id: "EST-" + Math.floor(1000 + Math.random() * 9000)
+      });
+    }
+
+    if (urlPath.includes("/query") || urlPath.includes("/historian/ask")) {
+      const q = body.question || body.query || body.prompt || "Анализ данных";
+      return jsonResp({
+        status: "ok",
+        answer: "Аналитический ответ (Demo AI): по запросу «" + q + "» выявлена устойчивая корреляция (r = 0.78, p < 0.01). Медианные значения находятся в пределах целевого диапазона без критических выбросов.",
+        metrics: [
+          { label: "Медиана", value: "42.8" },
+          { label: "Std Dev", value: "6.14" },
+          { label: "Выбросы", value: "2.1%" }
+        ]
+      });
+    }
+
+    if (urlPath.includes("/quiz/recommend")) {
+      return jsonResp({
+        status: "ok",
+        recommendation: {
+          name: "Ethiopia Yirgacheffe Kochere",
+          origin: "Ethiopia",
+          roast: "Light Filter",
+          notes: ["Бергамот", "Жасмин", "Персик"],
+          match_percent: 96
+        }
+      });
+    }
+
+    if (urlPath.includes("/verify-passcode")) {
+      return jsonResp({ status: "success", unlocked: true, valid: true, message: "VIP ACCESS GRANTED" });
+    }
+
+    if (urlPath.includes("/track-order")) {
+      return jsonResp({
+        status: "success",
+        order_id: urlPath.split("/").pop() || "CR-2026",
+        stage: "Регулировка хода и тест герметичности (Этап 4/5)",
+        master: "Виктор К.",
+        eta: "2 дня"
+      });
+    }
+
+    if (urlPath.includes("/tasks")) {
+      localState.tasks = localState.tasks || (MOCK_DB["/api/tasks"] && MOCK_DB["/api/tasks"].tasks) || [];
+      if (method === "POST" && urlPath.endsWith("/tasks")) {
+        const t = { id: Date.now(), title: body.title || "Новая задача", duration_hours: Number(body.duration_hours || 1), quadrant: body.quadrant || "urgent_important", is_completed: false };
+        localState.tasks.push(t);
+        saveState();
+        return jsonResp({ status: "ok", task: t, tasks: localState.tasks });
+      }
+      if (urlPath.includes("/toggle")) {
+        const id = Number(urlPath.split("/")[3]);
+        localState.tasks = localState.tasks.map(t => t.id === id ? { ...t, is_completed: !t.is_completed } : t);
+        saveState();
+        return jsonResp({ status: "ok", tasks: localState.tasks });
+      }
+      if (method === "DELETE") {
+        const id = Number(urlPath.split("/").pop());
+        localState.tasks = localState.tasks.filter(t => t.id !== id);
+        saveState();
+        return jsonResp({ status: "ok", tasks: localState.tasks });
+      }
+      return jsonResp({ tasks: localState.tasks });
+    }
+
+    if (urlPath === "/api/state") {
+      return jsonResp(MOCK_DB["/api/state"] || {
+        title: "LIVE RAP & TECH BATTLE // FINAL",
+        round: 3,
+        status: "VOTING_OPEN",
+        fighters: [
+          { id: "mc_a", name: "MC NEON", votes: 142, color: "#00f0ff" },
+          { id: "mc_b", name: "BYTE_KILLER", votes: 138, color: "#ff007f" }
+        ]
+      });
+    }
+
+    if (urlPath === "/api/vote") {
+      return jsonResp({ status: "ok", message: "Голос учтен!", voted: true });
+    }
+
+    // Default POST confirmation (bookings, orders, quotes, appraisals, seat reservations)
+    const refId = "ID-" + Math.floor(10000 + Math.random() * 90000);
+    return jsonResp({
+      status: "ok",
+      success: true,
+      id: refId,
+      booking_id: refId,
+      cert_id: refId,
+      voucher: "VIP-" + refId,
+      order_id: refId,
+      message: "Заявка #" + refId + " успешно оформлена и синхронизирована с Telegram-ботом @Idrisov_prod!"
+    });
+  };
+
+  function jsonResp(data) {
+    return new Response(JSON.stringify(data), {
+      status: 200,
+      headers: { "Content-Type": "application/json" }
+    });
+  }
+})();
+</script>
+
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AlibiGen Pro 98 // DEADLINE DEFENDER</title>
+  <link rel="stylesheet" href="style.css">
+  <link href="https://fonts.googleapis.com/css2?family=VT323&family=Pixelify+Sans:wght@500;700&display=swap" rel="stylesheet">
+</head>
+<body class="desktop-body">
+  <!-- CRT Scanline Overlay -->
+  <div class="crt-overlay" id="crtOverlay"></div>
+
+  <!-- Desktop Icons -->
+  <div class="desktop-icons">
+    <div class="icon-item" id="iconGen">
+      <div class="icon-glyph">💾</div>
+      <span>AlibiGen.exe</span>
+    </div>
+    <div class="icon-item" id="iconStudio">
+      <div class="icon-glyph">🖥</div>
+      <span>CrashStudio</span>
+    </div>
+    <div class="icon-item" id="iconTerminal">
+      <div class="icon-glyph">📟</div>
+      <span>SysLog.log</span>
+    </div>
+  </div>
+
+  <!-- Window 1: Excuse Generator -->
+  <div class="win98-window" id="winGenerator" style="top: 30px; left: 60px; width: 440px;">
+    <div class="win-titlebar">
+      <div class="title-left">
+        <span class="win-icon">💡</span>
+        <span class="win-title">Alibi Generator v2.4 (Registered)</span>
+      </div>
+      <div class="win-controls">
+        <button class="win-btn" title="Minimize">_</button>
+        <button class="win-btn" title="Maximize">□</button>
+        <button class="win-btn close-btn" title="Close">×</button>
+      </div>
+    </div>
+    <div class="win-body">
+      <div class="form-group">
+        <label>TARGET RECIPIENT:</label>
+        <select id="selRecipient" class="win-select">
+          <option value="client">Client (Заказчик / Клиент)</option>
+          <option value="teamlead" selected>Team Lead (Тимлид / ПМ)</option>
+          <option value="boss">Boss / CTO (Генеральный / Шеф)</option>
+          <option value="spouse">Spouse / Partner (Супруг(а) / Девушка)</option>
+          <option value="professor">Professor (Преподаватель / Деканат)</option>
+        </select>
+      </div>
+
+      <!-- Slider 1: Absurdity -->
+      <div class="slider-row">
+        <div class="slider-labels">
+          <span>Уровень абсурда:</span>
+          <span class="val-badge" id="valAbsurd">35%</span>
+        </div>
+        <input type="range" id="rngAbsurd" min="0" max="100" value="35" class="win-slider"/>
+      </div>
+
+      <!-- Slider 2: Pity -->
+      <div class="slider-row">
+        <div class="slider-labels">
+          <span>Степень жалости:</span>
+          <span class="val-badge" id="valPity">40%</span>
+        </div>
+        <input type="range" id="rngPity" min="0" max="100" value="40" class="win-slider"/>
+      </div>
+
+      <!-- Slider 3: Tech Jargon -->
+      <div class="slider-row">
+        <div class="slider-labels">
+          <span>Техническая заумность:</span>
+          <span class="val-badge" id="valTech">85%</span>
+        </div>
+        <input type="range" id="rngTech" min="0" max="100" value="85" class="win-slider"/>
+      </div>
+
+      <button class="win-button btn-primary" id="btnSynthesize">
+        ⚙ СИНТЕЗИРОВАТЬ ОТМАЗКУ
+      </button>
+
+      <div class="output-box">
+        <label>СГЕНЕРИРОВАННОЕ ОПРАВДАНИЕ:</label>
+        <textarea id="txtExcuse" class="win-textarea" rows="4" readonly></textarea>
+        <div class="output-footer">
+          <div class="metric-cell">
+            <span>ПРАВДОПОДОБИЕ:</span>
+            <div class="meter-bar"><div class="meter-fill" id="meterFill" style="width: 78%;"></div></div>
+            <strong id="believabilityVal">78%</strong>
+          </div>
+          <button class="win-button" id="btnCopy">КОПИРОВАТЬ</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Window 2: Crash Evidence Studio -->
+  <div class="win98-window" id="winStudio" style="top: 50px; left: 520px; width: 560px;">
+    <div class="win-titlebar">
+      <div class="title-left">
+        <span class="win-icon">📸</span>
+        <span class="win-title">Crash Evidence Studio - [Evidence01.png]</span>
+      </div>
+      <div class="win-controls">
+        <button class="win-btn">_</button>
+        <button class="win-btn">□</button>
+        <button class="win-btn close-btn">×</button>
+      </div>
+    </div>
+    <div class="win-body">
+      <div class="studio-controls">
+        <div class="form-row">
+          <label>PRESET:</label>
+          <select id="selPreset" class="win-select">
+            <option value="bsod" selected>Windows BSoD (Fatal Exception 0E)</option>
+            <option value="kernel_panic">Linux Kernel Panic (CPU Core Dump)</option>
+            <option value="gateway500">HTTP 502 / 500 Bad Gateway</option>
+            <option value="compiler">Compiler Fatal Error Trace (GCC / Rust)</option>
+          </select>
+        </div>
+        <div class="form-row">
+          <label>CUSTOM ERROR / REASON:</label>
+          <input type="text" id="txtCustomError" class="win-input" value="CRITICAL_PROCESS_DIED 0x000000EF" />
+        </div>
+      </div>
+
+      <!-- Live Canvas Preview -->
+      <div class="canvas-viewport">
+        <canvas id="evidenceCanvas" width="600" height="360"></canvas>
+      </div>
+
+      <div class="canvas-actions">
+        <button class="win-button" id="btnRefreshCanvas">ОБНОВИТЬ СКРИНШОТ</button>
+        <button class="win-button btn-primary" id="btnDownloadEvidence">💾 СКАЧАТЬ PNG ДОКАЗАТЕЛЬСТВО</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bottom Taskbar -->
+  <div class="win-taskbar">
+    <button class="start-btn" id="startBtn">
+      <span class="win-flag">🪟</span>
+      <strong>Пуск</strong>
+    </button>
+    <div class="taskbar-divider"></div>
+    <div class="active-tasks">
+      <div class="task-tab active">AlibiGen Pro</div>
+      <div class="task-tab">Evidence Studio</div>
+    </div>
+    <div class="system-tray">
+      <label class="crt-toggle-label">
+        <input type="checkbox" id="chkCrt" checked />
+        <span>CRT 50Hz</span>
+      </label>
+      <div class="tray-clock" id="trayClock">19:45</div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
